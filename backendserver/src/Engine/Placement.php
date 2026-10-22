@@ -27,13 +27,16 @@ final class Placement
      * at $sponsorId's position (falling back to the global root).
      * Must be called inside a transaction.
      */
-    public static function place(int $userId, ?int $sponsorId): void
+    public static function place(int $userId, ?int $sponsorId, ?string $team = null): void
     {
+        // All placements share one transaction-held lock, including first-root creation.
+        DB::one('SELECT id FROM lo_placement_lock WHERE id = 1 FOR UPDATE');
         $node = DB::one('SELECT * FROM lo_tree WHERE user_id = ? FOR UPDATE', [$userId]);
         if (!$node) throw new HttpError('Tree node missing', 500);
         if ($node['placement_parent_id'] !== null) return; // already placed
 
-        $parentId = self::findSlot($sponsorId, $userId);
+        $slot = self::preview($sponsorId, $team, $userId);
+        $parentId = $slot['parent_id'] ?? null;
         if ($parentId === null) {
             // Very first node in the whole tree — becomes the root.
             DB::run('UPDATE lo_tree SET placement_parent_id = NULL, placement_side = NULL WHERE user_id = ?', [$userId]);
@@ -41,17 +44,37 @@ final class Placement
         }
 
         $parent = DB::one('SELECT left_child_id, right_child_id FROM lo_tree WHERE user_id = ? FOR UPDATE', [$parentId]);
-        if ($parent['left_child_id'] === null) {
+        if (!$parent) throw new HttpError('Placement parent missing', 500);
+        if ($slot['side'] === 'L' && $parent['left_child_id'] === null) {
             // The parent's child pointer stores the CHILD's id.
             DB::run('UPDATE lo_tree SET left_child_id = ? WHERE user_id = ?', [$userId, $parentId]);
             $side = 'L';
-        } elseif ($parent['right_child_id'] === null) {
+        } elseif ($slot['side'] === 'R' && $parent['right_child_id'] === null) {
             DB::run('UPDATE lo_tree SET right_child_id = ? WHERE user_id = ?', [$userId, $parentId]);
             $side = 'R';
         } else {
             throw new HttpError('Placement race detected, retry', 409);
         }
         DB::run('UPDATE lo_tree SET placement_parent_id = ?, placement_side = ? WHERE user_id = ?', [$parentId, $side, $userId]);
+        DB::run('UPDATE users SET placement_id = ?, position = ? WHERE id = ?', [$parentId, $side === 'L' ? 'left' : 'right', $userId]);
+    }
+
+    /** Advisory preview. Registration recomputes this under the placement lock. */
+    public static function preview(?int $sponsorId, ?string $team = null, int $excludeId = 0): ?array
+    {
+        if ($team !== null && !in_array($team, ['L', 'R'], true)) throw new HttpError('Invalid team');
+        $root = $sponsorId;
+        if ($team !== null) {
+            $sponsor = DB::one('SELECT left_child_id, right_child_id FROM lo_tree WHERE user_id = ?', [$sponsorId]);
+            if (!$sponsor) throw new HttpError('Sponsor tree missing');
+            $child = $sponsor[$team === 'L' ? 'left_child_id' : 'right_child_id'];
+            if ($child === null) return ['parent_id' => $sponsorId, 'side' => $team];
+            $root = (int) $child;
+        }
+        $parentId = self::findSlot($root, $excludeId);
+        if ($parentId === null) return null;
+        $parent = DB::one('SELECT left_child_id FROM lo_tree WHERE user_id = ?', [$parentId]);
+        return ['parent_id' => $parentId, 'side' => $parent['left_child_id'] === null ? 'L' : 'R'];
     }
 
     /**
@@ -71,7 +94,11 @@ final class Placement
             $batch = array_splice($queue, 0, 50);
             $in = implode(',', array_map('intval', $batch));
             $rows = DB::all("SELECT user_id, left_child_id, right_child_id FROM lo_tree WHERE user_id IN ($in)");
-            foreach ($rows as $r) {
+            $indexed = array_column($rows, null, 'user_id');
+            // SQL IN does not preserve queue order: explicitly visit left before right.
+            foreach ($batch as $id) {
+                $r = $indexed[$id] ?? null;
+                if (!$r) continue;
                 if ((int) $r['user_id'] === $excludeId) continue; // never self-parent
                 if ($r['left_child_id'] === null || $r['right_child_id'] === null) return (int) $r['user_id'];
                 if ($r['left_child_id'] !== null) $queue[] = (int) $r['left_child_id'];
