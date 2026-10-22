@@ -53,3 +53,9 @@
 - [x] Join page via referral link (auto sponsor + auto placement)
 - [x] ROOT button on login page, referral link copy on dashboard
 - [ ] Deploy to live server — blocked: live server returns 502 (down)
+
+# Admin panel (/admin)
+- [x] Build all 17 admin pages matching the reference kit: login, dashboard (company info), site config, plan & ranks, notices, scroll news, password change, member list, member report, joining report, package activation, balance add, bonus report (ledger), withdrawals, matching events, rank reward, statement close, sales report, rank achievers.
+- [x] Verify every page renders with demo data in the browser; exercise withdrawal approve, activation confirm (SUCCESS), rank reward payment, balance add and statement close flows end-to-end in demo mode.
+- [x] Dedicated admin banner image (Life OS — Admin Panel) in the admin shell header.
+- [ ] Verify admin login and all pages against the live PHP API (deserver.neexthub.site) — blocked: external host returns 502.
