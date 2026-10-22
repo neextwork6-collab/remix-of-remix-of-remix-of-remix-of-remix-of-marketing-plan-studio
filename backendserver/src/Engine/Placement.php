@@ -8,8 +8,8 @@ use LifeOS\HttpError;
 
 /**
  * Binary placement tree. Sponsor (enrollment tree) and placement are fully separate.
- * Placement is automatic: first free slot in breadth-first order from the sponsor's
- * subtree root (or global root if sponsor has none).
+ * Team links extend only the selected same-side chain from the sponsor.
+ * Legacy requests without a team retain breadth-first placement.
  */
 final class Placement
 {
@@ -23,8 +23,8 @@ final class Placement
     }
 
     /**
-     * Places $userId under the first available binary slot, starting the search
-     * at $sponsorId's position (falling back to the global root).
+     * Places $userId at the end of the sponsor's selected same-side chain.
+     * Without a team, legacy placement searches for the first free binary slot.
      * Must be called inside a transaction.
      */
     public static function place(int $userId, ?int $sponsorId, ?string $team = null): void
