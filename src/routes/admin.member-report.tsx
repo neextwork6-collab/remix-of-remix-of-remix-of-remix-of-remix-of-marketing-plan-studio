@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Page, DataTable, fmtDate } from "@/components/admin-kit";
+import { Page, DataTable, fmtDateShort } from "@/components/admin-kit";
 import { FilterBar, useAdmin } from "@/components/admin-kit";
 import { bdt } from "@/lib/member-api";
 
@@ -36,7 +36,7 @@ function MemberReport() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Phone", "Directs", "Purchased", "Earned", "Withdrawn", "Balance"]}
           rows={rows.map((r, i) => [
-            i + 1, fmtDate(r.created_at).slice(0, 16), r.life_id, r.name, r.phone, r.directs,
+            i + 1, fmtDateShort(r.created_at), r.life_id, r.name, r.phone, r.directs,
             bdt(r.purchased), bdt(r.earned), bdt(r.withdrawn),
             <b key="b">{bdt(r.balance)}</b>,
           ]).concat(rows.length > 0 ? [[
