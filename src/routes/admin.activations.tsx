@@ -45,7 +45,7 @@ function Activations() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Code", "Payment Ref", "Fee", "BV", "Status", "Action"]}
           rows={rows.map((a, i) => [
-            i + 1, fmtDate(a.created_at).slice(0, 16), a.life_id, a.name, a.activation_code, a.payment_ref,
+            i + 1, fmtDate(a.created_at), a.life_id, a.name, a.activation_code, a.payment_ref,
             a.fee, a.bv,
             <b key="s" style={{ color: a.payment_status === "SUCCESS" ? "#009541" : a.payment_status === "PENDING" ? "#B8860B" : "#C00" }}>{a.payment_status}</b>,
             a.payment_status === "PENDING" ? (

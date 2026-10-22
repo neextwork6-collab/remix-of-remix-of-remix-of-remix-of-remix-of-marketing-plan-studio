@@ -21,7 +21,7 @@ function SalesReport() {
         <DataTable
           head={["Sl", "Date", "Sale Code", "Life ID", "Name", "Fee", "Matching", "Matching Paid", "Generation Paid", "Status"]}
           rows={rows.map((s, i) => [
-            i + 1, fmtDate(s.created_at).slice(0, 16), s.sale_code, s.life_id, s.name,
+            i + 1, fmtDate(s.created_at), s.sale_code, s.life_id, s.name,
             s.fee, `${s.matching_count}/11`, s.matching_paid, s.generation_paid,
             <b key="st" style={{ color: s.status === "OPEN" ? "#009541" : "#B8860B" }}>{s.status}</b>,
           ])}

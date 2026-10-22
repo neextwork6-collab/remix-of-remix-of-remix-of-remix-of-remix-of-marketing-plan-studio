@@ -52,7 +52,7 @@ function RankReward() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Rank", "Reward"]}
           rows={rows.map((r, i) => [
-            i + 1, fmtDate(r.achieved_at).slice(0, 16), r.life_id, r.name, r.rank_name,
+            i + 1, fmtDate(r.achieved_at), r.life_id, r.name, r.rank_name,
             <button key="b" type="button" onClick={() => setForm({ userId: r.user_id, amount: "", reference: "" })} style={{ padding: "2px 12px" }}>Reward</button>,
           ])}
         />

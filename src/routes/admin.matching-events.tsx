@@ -21,7 +21,7 @@ function MatchingEvents() {
         <DataTable
           head={["Sl", "Date", "Event Code", "Beneficiary", "Event #", "Enrollment", "Binary", "Selected", "Type", "Payout", "Status"]}
           rows={rows.map((e, i) => [
-            i + 1, fmtDate(e.created_at).slice(0, 16), e.event_code, e.beneficiary_id,
+            i + 1, fmtDate(e.created_at), e.event_code, e.beneficiary_id,
             `${e.event_number}/11`,
             e.enrollment_bill, e.binary_bill, e.selected_bill, e.selected_type,
             <b key="p">{e.actual_payout}</b>,

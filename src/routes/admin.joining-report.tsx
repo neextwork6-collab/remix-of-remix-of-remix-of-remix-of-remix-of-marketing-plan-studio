@@ -21,7 +21,7 @@ function JoiningReport() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Phone", "Email", "Sponsor"]}
           rows={rows.map((m, i) => [
-            i + 1, fmtDate(m.created_at).slice(0, 16), m.life_id, m.name, m.phone, m.email ?? "—", m.sponsor_life_id ?? "—",
+            i + 1, fmtDate(m.created_at), m.life_id, m.name, m.phone, m.email ?? "—", m.sponsor_life_id ?? "—",
           ])}
         />
       )}

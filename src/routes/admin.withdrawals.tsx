@@ -39,7 +39,7 @@ function Withdrawals() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Method", "Account", "Amount", "Charge", "Status", "Action"]}
           rows={rows.map((w, i) => [
-            i + 1, fmtDate(w.created_at).slice(0, 16), w.life_id, w.name, w.method, w.account_number,
+            i + 1, fmtDate(w.created_at), w.life_id, w.name, w.method, w.account_number,
             w.amount, w.charge,
             <b key="s" style={{ color: w.status === "APPROVED" ? "#009541" : w.status === "PENDING" ? "#B8860B" : "#C00" }}>{w.status}</b>,
             w.status === "PENDING" ? (

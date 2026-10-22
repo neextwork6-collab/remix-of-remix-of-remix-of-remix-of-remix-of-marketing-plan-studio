@@ -21,7 +21,7 @@ function RankAchievers() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Phone", "Rank"]}
           rows={rows.map((r, i) => [
-            i + 1, fmtDate(r.achieved_at).slice(0, 16), r.life_id, r.name, r.phone,
+            i + 1, fmtDate(r.achieved_at), r.life_id, r.name, r.phone,
             <b key="r" style={{ color: "#009541" }}>{r.rank_name}</b>,
           ])}
         />

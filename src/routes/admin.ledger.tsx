@@ -32,7 +32,7 @@ function Ledger() {
           <DataTable
             head={["Sl", "Date", "Life ID", "Name", "Type", "Level", "Amount", "Status", "Note"]}
             rows={rows.map((l, i) => [
-              i + 1, fmtDate(l.created_at).slice(0, 16), l.life_id, l.name, l.ledger_type,
+              i + 1, fmtDate(l.created_at), l.life_id, l.name, l.ledger_type,
               l.level ?? "—",
               <b key="a" style={{ color: Number(l.amount) < 0 ? "#C00" : "#009541" }}>{l.amount}</b>,
               l.status, l.note ?? "—",
