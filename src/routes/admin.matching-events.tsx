@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Page, DataTable, Msg, fmtDate, FilterBar, useAdmin } from "@/components/admin-kit";
 
 export const Route = createFileRoute("/admin/matching-events")({
-  head: () => ({ meta: [{ title: "Matching Events — Life OS Admin" }, { name: "description", "content": "Matching event history and payouts." } as any, { property: "og:title", content: "Matching Events — Life OS Admin" }, { property: "og:description", content: "Matching event history and payouts." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Matching Events — Life OS Admin" }, { name: "description", content: "Matching event history and payouts." }, { property: "og:title", content: "Matching Events — Life OS Admin" }, { property: "og:description", content: "Matching event history and payouts." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: MatchingEvents,
 });
 

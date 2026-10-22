@@ -39,13 +39,23 @@ import { Route as SeniorManagementRouteImport } from './routes/senior-management
 import { Route as TripleStemcellH2oRouteImport } from './routes/triple-stemcell-h2o'
 import { Route as VideoGalleryRouteImport } from './routes/video-gallery'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivationsRouteImport } from './routes/admin.activations'
+import { Route as AdminBalanceAddRouteImport } from './routes/admin.balance-add'
+import { Route as AdminJoiningReportRouteImport } from './routes/admin.joining-report'
+import { Route as AdminLedgerRouteImport } from './routes/admin.ledger'
+import { Route as AdminMatchingEventsRouteImport } from './routes/admin.matching-events'
 import { Route as AdminMemberListRouteImport } from './routes/admin.member-list'
 import { Route as AdminMemberReportRouteImport } from './routes/admin.member-report'
 import { Route as AdminNoticeRouteImport } from './routes/admin.notice'
 import { Route as AdminPasswordRouteImport } from './routes/admin.password'
 import { Route as AdminPlanRouteImport } from './routes/admin.plan'
+import { Route as AdminRankAchieversRouteImport } from './routes/admin.rank-achievers'
+import { Route as AdminRankRewardRouteImport } from './routes/admin.rank-reward'
+import { Route as AdminSalesReportRouteImport } from './routes/admin.sales-report'
 import { Route as AdminScrollNewsRouteImport } from './routes/admin.scroll-news'
 import { Route as AdminSiteConfigRouteImport } from './routes/admin.site-config'
+import { Route as AdminStatementsRouteImport } from './routes/admin.statements'
+import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MemberIndexRouteImport } from './routes/member.index'
 import { Route as MemberActivationRouteImport } from './routes/member.activation'
@@ -210,6 +220,31 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActivationsRoute = AdminActivationsRouteImport.update({
+  id: '/activations',
+  path: '/activations',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBalanceAddRoute = AdminBalanceAddRouteImport.update({
+  id: '/balance-add',
+  path: '/balance-add',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJoiningReportRoute = AdminJoiningReportRouteImport.update({
+  id: '/joining-report',
+  path: '/joining-report',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLedgerRoute = AdminLedgerRouteImport.update({
+  id: '/ledger',
+  path: '/ledger',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMatchingEventsRoute = AdminMatchingEventsRouteImport.update({
+  id: '/matching-events',
+  path: '/matching-events',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMemberListRoute = AdminMemberListRouteImport.update({
   id: '/member-list',
   path: '/member-list',
@@ -235,6 +270,21 @@ const AdminPlanRoute = AdminPlanRouteImport.update({
   path: '/plan',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRankAchieversRoute = AdminRankAchieversRouteImport.update({
+  id: '/rank-achievers',
+  path: '/rank-achievers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRankRewardRoute = AdminRankRewardRouteImport.update({
+  id: '/rank-reward',
+  path: '/rank-reward',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSalesReportRoute = AdminSalesReportRouteImport.update({
+  id: '/sales-report',
+  path: '/sales-report',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminScrollNewsRoute = AdminScrollNewsRouteImport.update({
   id: '/scroll-news',
   path: '/scroll-news',
@@ -243,6 +293,16 @@ const AdminScrollNewsRoute = AdminScrollNewsRouteImport.update({
 const AdminSiteConfigRoute = AdminSiteConfigRouteImport.update({
   id: '/site-config',
   path: '/site-config',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStatementsRoute = AdminStatementsRouteImport.update({
+  id: '/statements',
+  path: '/statements',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -341,13 +401,23 @@ export interface FileRoutesByFullPath {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/activations': typeof AdminActivationsRoute
+  '/admin/balance-add': typeof AdminBalanceAddRoute
+  '/admin/joining-report': typeof AdminJoiningReportRoute
+  '/admin/ledger': typeof AdminLedgerRoute
+  '/admin/matching-events': typeof AdminMatchingEventsRoute
   '/admin/member-list': typeof AdminMemberListRoute
   '/admin/member-report': typeof AdminMemberReportRoute
   '/admin/notice': typeof AdminNoticeRoute
   '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/rank-achievers': typeof AdminRankAchieversRoute
+  '/admin/rank-reward': typeof AdminRankRewardRoute
+  '/admin/sales-report': typeof AdminSalesReportRoute
   '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
+  '/admin/statements': typeof AdminStatementsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
   '/member/change-password': typeof MemberChangePasswordRoute
@@ -391,13 +461,23 @@ export interface FileRoutesByTo {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/activations': typeof AdminActivationsRoute
+  '/admin/balance-add': typeof AdminBalanceAddRoute
+  '/admin/joining-report': typeof AdminJoiningReportRoute
+  '/admin/ledger': typeof AdminLedgerRoute
+  '/admin/matching-events': typeof AdminMatchingEventsRoute
   '/admin/member-list': typeof AdminMemberListRoute
   '/admin/member-report': typeof AdminMemberReportRoute
   '/admin/notice': typeof AdminNoticeRoute
   '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/rank-achievers': typeof AdminRankAchieversRoute
+  '/admin/rank-reward': typeof AdminRankRewardRoute
+  '/admin/sales-report': typeof AdminSalesReportRoute
   '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
+  '/admin/statements': typeof AdminStatementsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
   '/member/change-password': typeof MemberChangePasswordRoute
@@ -444,13 +524,23 @@ export interface FileRoutesById {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/activations': typeof AdminActivationsRoute
+  '/admin/balance-add': typeof AdminBalanceAddRoute
+  '/admin/joining-report': typeof AdminJoiningReportRoute
+  '/admin/ledger': typeof AdminLedgerRoute
+  '/admin/matching-events': typeof AdminMatchingEventsRoute
   '/admin/member-list': typeof AdminMemberListRoute
   '/admin/member-report': typeof AdminMemberReportRoute
   '/admin/notice': typeof AdminNoticeRoute
   '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/rank-achievers': typeof AdminRankAchieversRoute
+  '/admin/rank-reward': typeof AdminRankRewardRoute
+  '/admin/sales-report': typeof AdminSalesReportRoute
   '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
+  '/admin/statements': typeof AdminStatementsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/admin_/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
   '/member/change-password': typeof MemberChangePasswordRoute
@@ -498,13 +588,23 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/activations'
+    | '/admin/balance-add'
+    | '/admin/joining-report'
+    | '/admin/ledger'
+    | '/admin/matching-events'
     | '/admin/member-list'
     | '/admin/member-report'
     | '/admin/notice'
     | '/admin/password'
     | '/admin/plan'
+    | '/admin/rank-achievers'
+    | '/admin/rank-reward'
+    | '/admin/sales-report'
     | '/admin/scroll-news'
     | '/admin/site-config'
+    | '/admin/statements'
+    | '/admin/withdrawals'
     | '/admin/login'
     | '/member/activation'
     | '/member/change-password'
@@ -548,13 +648,23 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/activations'
+    | '/admin/balance-add'
+    | '/admin/joining-report'
+    | '/admin/ledger'
+    | '/admin/matching-events'
     | '/admin/member-list'
     | '/admin/member-report'
     | '/admin/notice'
     | '/admin/password'
     | '/admin/plan'
+    | '/admin/rank-achievers'
+    | '/admin/rank-reward'
+    | '/admin/sales-report'
     | '/admin/scroll-news'
     | '/admin/site-config'
+    | '/admin/statements'
+    | '/admin/withdrawals'
     | '/admin/login'
     | '/member/activation'
     | '/member/change-password'
@@ -600,13 +710,23 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/activations'
+    | '/admin/balance-add'
+    | '/admin/joining-report'
+    | '/admin/ledger'
+    | '/admin/matching-events'
     | '/admin/member-list'
     | '/admin/member-report'
     | '/admin/notice'
     | '/admin/password'
     | '/admin/plan'
+    | '/admin/rank-achievers'
+    | '/admin/rank-reward'
+    | '/admin/sales-report'
     | '/admin/scroll-news'
     | '/admin/site-config'
+    | '/admin/statements'
+    | '/admin/withdrawals'
     | '/admin_/login'
     | '/member/activation'
     | '/member/change-password'
@@ -869,6 +989,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/activations': {
+      id: '/admin/activations'
+      path: '/activations'
+      fullPath: '/admin/activations'
+      preLoaderRoute: typeof AdminActivationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/balance-add': {
+      id: '/admin/balance-add'
+      path: '/balance-add'
+      fullPath: '/admin/balance-add'
+      preLoaderRoute: typeof AdminBalanceAddRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/joining-report': {
+      id: '/admin/joining-report'
+      path: '/joining-report'
+      fullPath: '/admin/joining-report'
+      preLoaderRoute: typeof AdminJoiningReportRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ledger': {
+      id: '/admin/ledger'
+      path: '/ledger'
+      fullPath: '/admin/ledger'
+      preLoaderRoute: typeof AdminLedgerRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/matching-events': {
+      id: '/admin/matching-events'
+      path: '/matching-events'
+      fullPath: '/admin/matching-events'
+      preLoaderRoute: typeof AdminMatchingEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/member-list': {
       id: '/admin/member-list'
       path: '/member-list'
@@ -904,6 +1059,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPlanRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/rank-achievers': {
+      id: '/admin/rank-achievers'
+      path: '/rank-achievers'
+      fullPath: '/admin/rank-achievers'
+      preLoaderRoute: typeof AdminRankAchieversRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rank-reward': {
+      id: '/admin/rank-reward'
+      path: '/rank-reward'
+      fullPath: '/admin/rank-reward'
+      preLoaderRoute: typeof AdminRankRewardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sales-report': {
+      id: '/admin/sales-report'
+      path: '/sales-report'
+      fullPath: '/admin/sales-report'
+      preLoaderRoute: typeof AdminSalesReportRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/scroll-news': {
       id: '/admin/scroll-news'
       path: '/scroll-news'
@@ -916,6 +1092,20 @@ declare module '@tanstack/react-router' {
       path: '/site-config'
       fullPath: '/admin/site-config'
       preLoaderRoute: typeof AdminSiteConfigRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/statements': {
+      id: '/admin/statements'
+      path: '/statements'
+      fullPath: '/admin/statements'
+      preLoaderRoute: typeof AdminStatementsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/withdrawals': {
+      id: '/admin/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/admin/withdrawals'
+      preLoaderRoute: typeof AdminWithdrawalsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin_/login': {
@@ -1013,24 +1203,44 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminActivationsRoute: typeof AdminActivationsRoute
+  AdminBalanceAddRoute: typeof AdminBalanceAddRoute
+  AdminJoiningReportRoute: typeof AdminJoiningReportRoute
+  AdminLedgerRoute: typeof AdminLedgerRoute
+  AdminMatchingEventsRoute: typeof AdminMatchingEventsRoute
   AdminMemberListRoute: typeof AdminMemberListRoute
   AdminMemberReportRoute: typeof AdminMemberReportRoute
   AdminNoticeRoute: typeof AdminNoticeRoute
   AdminPasswordRoute: typeof AdminPasswordRoute
   AdminPlanRoute: typeof AdminPlanRoute
+  AdminRankAchieversRoute: typeof AdminRankAchieversRoute
+  AdminRankRewardRoute: typeof AdminRankRewardRoute
+  AdminSalesReportRoute: typeof AdminSalesReportRoute
   AdminScrollNewsRoute: typeof AdminScrollNewsRoute
   AdminSiteConfigRoute: typeof AdminSiteConfigRoute
+  AdminStatementsRoute: typeof AdminStatementsRoute
+  AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivationsRoute: AdminActivationsRoute,
+  AdminBalanceAddRoute: AdminBalanceAddRoute,
+  AdminJoiningReportRoute: AdminJoiningReportRoute,
+  AdminLedgerRoute: AdminLedgerRoute,
+  AdminMatchingEventsRoute: AdminMatchingEventsRoute,
   AdminMemberListRoute: AdminMemberListRoute,
   AdminMemberReportRoute: AdminMemberReportRoute,
   AdminNoticeRoute: AdminNoticeRoute,
   AdminPasswordRoute: AdminPasswordRoute,
   AdminPlanRoute: AdminPlanRoute,
+  AdminRankAchieversRoute: AdminRankAchieversRoute,
+  AdminRankRewardRoute: AdminRankRewardRoute,
+  AdminSalesReportRoute: AdminSalesReportRoute,
   AdminScrollNewsRoute: AdminScrollNewsRoute,
   AdminSiteConfigRoute: AdminSiteConfigRoute,
+  AdminStatementsRoute: AdminStatementsRoute,
+  AdminWithdrawalsRoute: AdminWithdrawalsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
