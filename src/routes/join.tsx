@@ -4,7 +4,7 @@ import { memberApi, memberToken } from "@/lib/member-api";
 import { Button } from "@/components/ui/button";
 import { BLOOD_GROUPS, DISTRICTS, type JoinTeam } from "@/lib/join-fields";
 
-type Search = { ref?: string; team?: JoinTeam };
+type Search = { ref?: string | undefined; team?: JoinTeam | undefined };
 type Sponsor = { name: string; life_id: string; placement_life_id: string; placement_side: JoinTeam };
 
 export const Route = createFileRoute("/join")({
