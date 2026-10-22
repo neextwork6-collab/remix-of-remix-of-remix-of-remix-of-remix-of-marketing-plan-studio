@@ -59,3 +59,12 @@
 - [x] Verify every page renders with demo data in the browser; exercise withdrawal approve, activation confirm (SUCCESS), rank reward payment, balance add and statement close flows end-to-end in demo mode.
 - [x] Dedicated admin banner image (Life OS — Admin Panel) in the admin shell header.
 - [ ] Verify admin login and all pages against the live PHP API (deserver.neexthub.site) — blocked: external host returns 502.
+
+## Admin panel — reference recheck (done)
+- [x] All 19 admin pages re-screenshotted and compared against the 19 reference screenshots
+- [x] Login page restyled to the reference look (green pattern bg, white ADMIN LOGIN box, captcha digit box, Login/Cancel)
+- [x] Date columns no longer truncated — compact YYYY-MM-DD HH:mm format (fmtDateShort) in Member List / Member Report
+- [x] Reference-style copyright footer bar added to AdminShell (replaced marquee)
+- [x] Verified in browser: build OK, no console errors
+- [ ] Confirm rank name "Gold/Executive" (1000 matchings) — the plan document labels it this way; rename if it is a typo
+- [ ] Live PHP API verification — blocked: deserver.neexthub.site returns 502
