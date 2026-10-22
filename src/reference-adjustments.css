@@ -470,3 +470,17 @@ body{top:0!important}
   .reference-site.reference-site .footer-classic-panel .row{gap:0}
   .reference-site.reference-site .footer-classic-panel .rights{font-size:11px;line-height:1.8}
 }
+
+/* Admin login — matches the reference admin kit (green pattern bg, white box) */
+.admin-login-page { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; background: #1e7a3c url(/member-kit/images/back.jpg) repeat; padding: 60px 16px; font-family: Tahoma, Arial, sans-serif; }
+.admin-login-box { background: #fff; border: 1px solid #ccc; padding: 18px 22px 16px; width: 230px; text-align: center; }
+.admin-login-title { font-size: 15px; font-weight: 700; color: #1a3a8f; margin: 0 0 14px; letter-spacing: 1px; }
+.admin-login-input { width: 100%; box-sizing: border-box; border: 1px solid #bbb; padding: 4px 6px; font-size: 11px; margin-bottom: 10px; outline: none; }
+.admin-login-input:focus { border-color: #009541; }
+.admin-login-captcha { display: inline-flex; gap: 6px; background: #2e8b3a; border: 0; border-radius: 3px; padding: 5px 10px; margin: 0 0 10px; cursor: pointer; }
+.admin-login-captcha span { color: #fff; font-style: italic; font-weight: 700; font-size: 13px; }
+.admin-login-err { color: #c00; font-size: 11px; font-weight: 600; margin: 0 0 8px; }
+.admin-login-actions { display: flex; gap: 6px; justify-content: flex-start; }
+.admin-login-btn { border: 1px solid #999; background: #f4f4f4; font-size: 11px; padding: 2px 8px; cursor: pointer; }
+.admin-login-btn:hover { background: #e8f4ec; }
+.admin-login-demo { margin-top: 12px; background: none; border: 0; color: #2e7d32; font-size: 11px; text-decoration: underline; cursor: pointer; }

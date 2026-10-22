@@ -170,3 +170,10 @@ export function Msg({ ok, text }: { ok?: boolean | undefined; text: string | nul
 }
 
 export const fmtDate = (s?: string | null) => (s ? new Date(s.replace(" ", "T")).toLocaleString("en-GB", { day: "2-digit", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" }) : "");
+/** Compact "YYYY-MM-DD HH:mm" for dense report tables (matches the reference admin kit). */
+export const fmtDateShort = (s?: string | null) => {
+  if (!s) return "";
+  const d = new Date(s.replace(" ", "T"));
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};

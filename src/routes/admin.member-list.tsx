@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Page, DataTable, Msg, fmtDate } from "@/components/admin-kit";
+import { Page, DataTable, Msg, fmtDateShort } from "@/components/admin-kit";
 import { FilterBar, useAdmin } from "@/components/admin-kit";
 import { adminApi } from "@/lib/admin-api";
 
@@ -38,7 +38,7 @@ function MemberList() {
         <DataTable
           head={["Sl", "Date", "Life ID", "Name", "Phone", "Email", "Sponsor", "Tree Active", "Status", "Change Status"]}
           rows={rows.map((m, i) => [
-            i + 1, fmtDate(m.created_at).slice(0, 16), m.life_id, m.name, m.phone, m.email ?? "—", m.sponsor_life_id,
+            i + 1, fmtDateShort(m.created_at), m.life_id, m.name, m.phone, m.email ?? "—", m.sponsor_life_id,
             m.is_active ? "Yes" : "No",
             <b key="s" style={{ color: m.status === "ACTIVE" ? "#009541" : "#C00" }}>{m.status}</b>,
             <select key="c" defaultValue="" onChange={(e) => { const v = e.target.value; if (v) { e.target.value = ""; setStatus(m.id, v); } }}>
