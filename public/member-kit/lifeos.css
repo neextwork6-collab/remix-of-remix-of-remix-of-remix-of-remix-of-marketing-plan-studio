@@ -54,3 +54,6 @@
 .lifeos-member .lifeos-profile-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .lifeos-member .lifeos-profile-grid > table { min-width: 0; }
 @media (prefers-reduced-motion: reduce) { .lifeos-member .lifeos-marquee { animation: none; padding-left: 0; } }
+
+/* Admin footer bar (matches the reference admin kit copyright strip) */
+.lifeos-member .lifeos-admin-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #0b5d1e; color: #fff; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 8px 0; }
