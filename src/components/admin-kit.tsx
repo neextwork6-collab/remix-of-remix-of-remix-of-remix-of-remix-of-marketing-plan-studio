@@ -2,9 +2,9 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { adminApi, adminToken } from "@/lib/admin-api";
-import { fmtDate } from "@/components/member-kit";
+import { fmtDate, fmtDateShort } from "@/components/member-kit";
 
-export { fmtDate };
+export { fmtDate, fmtDateShort };
 export { Page, DataTable, Msg } from "@/components/member-kit";
 
 /** Menu mirrors the reference admin kit structure (green member-panel style). */
@@ -137,16 +137,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <div className="print"><img src="/member-kit/images/printer.png" width={32} alt="Print" title="Print Inner Content" onClick={() => printInner()} /></div>
           </div>
         </div>
-        <div className="site_scroll_bottom">
-          <div className="site_scroll">
-            <div className="site_scroll_container">
-              <div className="lifeos-marquee">
-                <span>Welcome to the Life OS admin panel.</span>
-                <span>Confirm activations, process withdrawals and keep site settings up to date.</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="lifeos-admin-footer">COPYRIGHT © 2026 LIFE OS | ALL RIGHTS RESERVED.</div>
       </div>
     </div>
   );
