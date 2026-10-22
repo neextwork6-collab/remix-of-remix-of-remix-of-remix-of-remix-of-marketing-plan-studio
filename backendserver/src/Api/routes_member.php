@@ -268,3 +268,10 @@ function memberSummary(array $u): array
         'rank' => Rank::current($uid),
     ];
 }
+
+// Visible admin notices / scroll news for the member panel.
+$router->get('/api/member/notices', function () {
+    \LifeOS\Auth::member();
+    \LifeOS\Http::ok(\LifeOS\DB::all("SELECT id, kind, title, content, show_from, show_to, updated_at FROM lo_notices
+        WHERE is_visible = 1 AND (show_from IS NULL OR show_from <= CURDATE()) AND (show_to IS NULL OR show_to >= CURDATE()) ORDER BY id DESC LIMIT 50"));
+});
