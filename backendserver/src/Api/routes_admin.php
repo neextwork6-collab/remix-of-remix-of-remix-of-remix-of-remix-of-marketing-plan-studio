@@ -171,3 +171,186 @@ $router->post('/api/admin/statements/close', function () {
     });
     Http::ok(['date' => $date, 'statements_closed' => $closed]);
 });
+
+// ---------- Admin panel reports & content ----------
+
+/** Shared date/user filters for report endpoints: from, to (Y-m-d) and q (Life ID / phone). */
+function adminFilters(string $dateCol, ?string $userCol = 'u'): array
+{
+    $w = []; $p = [];
+    foreach (['from' => '>=', 'to' => '<='] as $k => $op) {
+        $d = (string) ($_GET[$k] ?? '');
+        if ($d === '') continue;
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) throw new HttpError("Invalid $k date", 422);
+        $w[] = "DATE($dateCol) $op ?"; $p[] = $d;
+    }
+    $q = trim((string) ($_GET['q'] ?? ''));
+    if ($q !== '' && $userCol) { $w[] = "($userCol.life_id LIKE ? OR $userCol.phone LIKE ?)"; $p[] = "%$q%"; $p[] = "%$q%"; }
+    return [$w ? ' WHERE ' . implode(' AND ', $w) : '', $p];
+}
+
+const ADMIN_NAME_SQL = '(SELECT name FROM user_profiles up WHERE up.user_id = u.id ORDER BY up.id LIMIT 1)';
+
+$router->get('/api/admin/company-info', function () {
+    Auth::admin();
+    $sum = fn(string $t) => (float) DB::val("SELECT COALESCE(SUM(amount),0) FROM lo_ledger WHERE ledger_type = ? AND status = 'PAID'", [$t]);
+    $w = fn(string $s) => (float) DB::val('SELECT COALESCE(SUM(amount),0) FROM lo_withdrawals WHERE status = ?', [$s]);
+    Http::ok([
+        'members' => (int) DB::val('SELECT COUNT(*) FROM users'),
+        'active_members' => (int) DB::val('SELECT COUNT(*) FROM lo_tree WHERE is_active = 1'),
+        'sales_count' => (int) DB::val("SELECT COUNT(*) FROM lo_sales WHERE status <> 'REVERSED'"),
+        'sales_amount' => (float) DB::val("SELECT COALESCE(SUM(fee),0) FROM lo_activations WHERE payment_status = 'SUCCESS'"),
+        'activations_pending' => (int) DB::val("SELECT COUNT(*) FROM lo_activations WHERE payment_status = 'PENDING'"),
+        'bonus' => ['CASHBACK' => $sum('CASHBACK'), 'REFERRAL' => $sum('REFERRAL'), 'MATCHING' => $sum('MATCHING'), 'GENERATION' => $sum('GENERATION'), 'RANK' => $sum('RANK'), 'ADJUSTMENT' => $sum('ADJUSTMENT')],
+        'withdraw' => ['APPROVED' => $w('APPROVED'), 'PENDING' => $w('PENDING'), 'REJECTED' => $w('REJECTED'),
+            'charges' => (float) DB::val("SELECT COALESCE(SUM(charge),0) FROM lo_withdrawals WHERE status = 'APPROVED'")],
+        'pools' => DB::all('SELECT * FROM lo_pools'),
+    ]);
+});
+
+$router->get('/api/admin/plan', function () {
+    Auth::admin();
+    $P = \LifeOS\Engine\Plan::class;
+    Http::ok([
+        'fee' => $P::FEE, 'allocations' => $P::ALLOCATIONS, 'generation' => $P::GENERATION,
+        'max_matching_events' => $P::MAX_MATCHING_EVENTS, 'daily_matching_cap' => $P::DAILY_MATCHING_CAP,
+        'matching_total_limit' => $P::MATCHING_TOTAL_LIMIT,
+    ]);
+});
+
+$router->get('/api/admin/ranks', function () {
+    Auth::admin();
+    Http::ok(DB::all('SELECT r.id, r.name, r.required_matchings, (SELECT COUNT(*) FROM lo_user_ranks ur WHERE ur.rank_id = r.id) AS achieved FROM lo_ranks r ORDER BY r.id'));
+});
+
+$router->get('/api/admin/rank-achievers', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('ur.achieved_at');
+    Http::ok(DB::all('SELECT ur.user_id, ur.achieved_at, r.name AS rank_name, u.life_id, u.phone, ' . ADMIN_NAME_SQL . ' AS name
+        FROM lo_user_ranks ur JOIN lo_ranks r ON r.id = ur.rank_id JOIN users u ON u.id = ur.user_id' . ($where ? $where . ' AND' : ' WHERE') . ' r.required_matchings > 0
+        ORDER BY ur.achieved_at DESC LIMIT 500', $p));
+});
+
+$router->get('/api/admin/member-list', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('u.created_at');
+    Http::ok(DB::all('SELECT u.id, u.life_id, u.phone, u.email, u.status, u.referred_by, u.created_at, ' . ADMIN_NAME_SQL . ' AS name,
+        t.is_active, t.lifetime_matchings, t.placement_side, (SELECT life_id FROM users s WHERE s.id = t.sponsor_id) AS sponsor_life_id
+        FROM users u LEFT JOIN lo_tree t ON t.user_id = u.id' . $where . ' ORDER BY u.id DESC LIMIT 500', $p));
+});
+
+$router->get('/api/admin/member-report', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('u.created_at');
+    $rows = DB::all("SELECT u.id, u.life_id, u.created_at, " . ADMIN_NAME_SQL . " AS name,
+        (SELECT life_id FROM users s JOIN lo_tree t ON s.id = t.sponsor_id WHERE t.user_id = u.id) AS sponsor_life_id,
+        (SELECT COUNT(*) FROM lo_tree c WHERE c.sponsor_id = u.id) AS directs,
+        (SELECT COALESCE(SUM(fee),0) FROM lo_activations a WHERE a.user_id = u.id AND a.payment_status = 'SUCCESS') AS purchased,
+        (SELECT COALESCE(SUM(amount),0) FROM lo_ledger l WHERE l.user_id = u.id AND l.status = 'PAID' AND l.ledger_type <> 'CASHBACK') AS earned,
+        (SELECT COALESCE(SUM(amount + charge),0) FROM lo_withdrawals w WHERE w.user_id = u.id AND w.status IN ('PENDING','APPROVED')) AS withdrawn
+        FROM users u" . $where . " ORDER BY u.id DESC LIMIT 500", $p);
+    foreach ($rows as &$r) $r['balance'] = round((float) $r['earned'] - (float) $r['withdrawn'], 2);
+    Http::ok(array_values(array_filter($rows, fn($r) => $r['balance'] > 0 || !empty($_GET['all']))));
+});
+
+$router->get('/api/admin/activations', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('a.created_at');
+    $st = (string) ($_GET['status'] ?? '');
+    if ($st !== '') {
+        if (!in_array($st, ['PENDING', 'SUCCESS', 'FAILED', 'CANCELLED', 'REFUNDED'], true)) throw new HttpError('Invalid status', 422);
+        $where .= ($where ? ' AND' : ' WHERE') . ' a.payment_status = ?'; $p[] = $st;
+    }
+    Http::ok(DB::all('SELECT a.id, a.activation_code, a.payment_ref, a.payment_status, a.fee, a.bv, a.processed, a.created_at, a.processed_at, u.life_id, u.phone, ' . ADMIN_NAME_SQL . ' AS name
+        FROM lo_activations a JOIN users u ON u.id = a.user_id' . $where . ' ORDER BY a.id DESC LIMIT 500', $p));
+});
+
+$router->get('/api/admin/joining-report', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('u.created_at');
+    Http::ok(DB::all('SELECT u.id, u.life_id, u.phone, u.created_at, u.status, ' . ADMIN_NAME_SQL . ' AS name, u.referred_by
+        FROM users u' . $where . ' ORDER BY u.id DESC LIMIT 500', $p));
+});
+
+$router->get('/api/admin/sales-report', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('s.created_at');
+    Http::ok(DB::all('SELECT s.id, s.sale_code, s.created_at, s.matching_count, s.matching_paid, s.generation_paid, s.status, a.fee, a.bv, a.payment_ref, u.life_id, ' . ADMIN_NAME_SQL . ' AS name
+        FROM lo_sales s JOIN lo_activations a ON a.id = s.activation_id JOIN users u ON u.id = s.user_id' . $where . ' ORDER BY s.id DESC LIMIT 500', $p));
+});
+
+$router->get('/api/admin/ledger', function () {
+    Auth::admin();
+    [$where, $p] = adminFilters('l.created_at');
+    $t = (string) ($_GET['type'] ?? '');
+    if ($t !== '') {
+        if (!in_array($t, ['CASHBACK', 'REFERRAL', 'MATCHING', 'GENERATION', 'RANK', 'ADJUSTMENT', 'WITHDRAW'], true)) throw new HttpError('Invalid type', 422);
+        $where .= ($where ? ' AND' : ' WHERE') . ' l.ledger_type = ?'; $p[] = $t;
+    }
+    Http::ok(DB::all('SELECT l.id, l.payout_code, l.ledger_type, l.amount, l.level, l.status, l.note, l.created_at, u.life_id, ' . ADMIN_NAME_SQL . ' AS name
+        FROM lo_ledger l JOIN users u ON u.id = l.user_id' . $where . ' ORDER BY l.id DESC LIMIT 1000', $p));
+});
+
+// Balance Add: credits a member through an audited ADJUSTMENT ledger row (never edits balances directly).
+$router->post('/api/admin/balance-add', function () {
+    $admin = Auth::admin();
+    $b = Http::body();
+    $amount = (float) ($b['amount'] ?? 0);
+    if (!is_finite($amount) || $amount == 0.0 || abs($amount) > 1000000) throw new HttpError('Enter a valid amount', 422);
+    $u = DB::one('SELECT id, life_id FROM users WHERE life_id = ?', [trim((string) ($b['life_id'] ?? ''))]);
+    if (!$u) throw new HttpError('Member not found', 404);
+    $code = 'ADJ-' . strtoupper(bin2hex(random_bytes(8)));
+    DB::run('INSERT INTO lo_ledger (payout_code, user_id, ledger_type, amount, note) VALUES (?,?,?,?,?)',
+        [$code, (int) $u['id'], 'ADJUSTMENT', $amount, mb_substr('By ' . $admin['name'] . ': ' . trim((string) ($b['note'] ?? 'Balance add')), 0, 255)]);
+    Http::ok(['payout_code' => $code, 'life_id' => $u['life_id'], 'amount' => $amount]);
+});
+
+$router->get('/api/admin/notices', function () {
+    Auth::admin();
+    $kind = ($_GET['kind'] ?? 'NOTICE') === 'SCROLL' ? 'SCROLL' : 'NOTICE';
+    Http::ok(DB::all('SELECT * FROM lo_notices WHERE kind = ? ORDER BY id DESC', [$kind]));
+});
+
+$router->post('/api/admin/notices', function () {
+    $admin = Auth::admin();
+    $b = Http::body();
+    $kind = ($b['kind'] ?? 'NOTICE') === 'SCROLL' ? 'SCROLL' : 'NOTICE';
+    $content = trim((string) ($b['content'] ?? ''));
+    if ($content === '' || strlen($content) > 20000) throw new HttpError('Content is required', 422);
+    $dates = [];
+    foreach (['show_from', 'show_to'] as $k) {
+        $d = (string) ($b[$k] ?? '');
+        if ($d !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) throw new HttpError("Invalid $k", 422);
+        $dates[] = $d ?: null;
+    }
+    $title = mb_substr(trim((string) ($b['title'] ?? '')), 0, 190) ?: null;
+    if (!empty($b['id'])) {
+        DB::run('UPDATE lo_notices SET title = ?, content = ?, show_from = ?, show_to = ?, updated_by = ? WHERE id = ? AND kind = ?',
+            [$title, $content, $dates[0], $dates[1], $admin['name'], (int) $b['id'], $kind]);
+        Http::ok(['id' => (int) $b['id']]);
+    }
+    Http::ok(['id' => DB::insert('INSERT INTO lo_notices (kind, title, content, show_from, show_to, updated_by) VALUES (?,?,?,?,?,?)',
+        [$kind, $title, $content, $dates[0], $dates[1], $admin['name']])]);
+});
+
+$router->post('/api/admin/notices/{id}/toggle', function ($p) {
+    Auth::admin();
+    DB::run('UPDATE lo_notices SET is_visible = 1 - is_visible WHERE id = ?', [(int) $p['id']]);
+    Http::ok();
+});
+
+$router->post('/api/admin/notices/{id}/delete', function ($p) {
+    Auth::admin();
+    DB::run('DELETE FROM lo_notices WHERE id = ?', [(int) $p['id']]);
+    Http::ok();
+});
+
+$router->post('/api/admin/password', function () {
+    $admin = Auth::admin();
+    $b = Http::body();
+    if (!password_verify((string) ($b['current'] ?? ''), (string) ($admin['password'] ?? ''))) throw new HttpError('Current password is wrong', 422);
+    $new = (string) ($b['new'] ?? '');
+    if (strlen($new) < 8) throw new HttpError('New password must be at least 8 characters', 422);
+    DB::run('UPDATE admin_users SET password = ? WHERE id = ?', [password_hash($new, PASSWORD_DEFAULT), (int) $admin['id']]);
+    Http::ok();
+});
