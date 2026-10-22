@@ -32,4 +32,5 @@
 - Fit the member portal through a single measured desktop canvas in the shared MemberShell; scale the whole canvas rather than adding mobile reflow rules, so every page preserves reference proportions.
 - New members must register through a sponsor referral link (except the very first account); the company ROOT member is created via the signed /api/master/root/ensure call so its password never sits in code.
 - Referral team previews are advisory; registration recomputes placement under a shared transaction-held lock and never trusts a submitted placement parent, preserving subtree isolation under concurrent joins.
+- Explicit team links traverse only the selected child pointer from the sponsor; keep legacy no-team placement separate so team registrations cannot spill into the opposite side.
 - Extended registration fields stay in the legacy users/user_profiles tables through additive migrations, keeping existing accounts and legacy referral registrations compatible.
