@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { adminApi, adminToken, ADMIN_DEMO_TOKEN } from "@/lib/admin-api";
 
-export const Route = createFileRoute("/admin/login")({
+export const Route = createFileRoute("/admin_/login")({
   head: () => ({
     meta: [
       { title: "Admin Login — Life OS" },
