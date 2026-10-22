@@ -65,11 +65,18 @@ final class Placement
         if ($team !== null && !in_array($team, ['L', 'R'], true)) throw new HttpError('Invalid team');
         $root = $sponsorId;
         if ($team !== null) {
-            $sponsor = DB::one('SELECT left_child_id, right_child_id FROM lo_tree WHERE user_id = ?', [$sponsorId]);
-            if (!$sponsor) throw new HttpError('Sponsor tree missing');
-            $child = $sponsor[$team === 'L' ? 'left_child_id' : 'right_child_id'];
-            if ($child === null) return ['parent_id' => $sponsorId, 'side' => $team];
-            $root = (int) $child;
+            // Team links follow the sponsor's outer leg: keep walking the same side
+            // until that side is free, so a Left link always lands on the last
+            // left-most member's left (and Right on the right-most member's right).
+            $col = $team === 'L' ? 'left_child_id' : 'right_child_id';
+            $cur = (int) $sponsorId;
+            for ($i = 0; $i < 100000; $i++) {
+                $node = DB::one("SELECT $col AS c FROM lo_tree WHERE user_id = ?", [$cur]);
+                if (!$node) throw new HttpError('Sponsor tree missing');
+                if ($node['c'] === null || (int) $node['c'] === $excludeId) return ['parent_id' => $cur, 'side' => $team];
+                $cur = (int) $node['c'];
+            }
+            throw new HttpError('Placement leg too deep');
         }
         $parentId = self::findSlot($root, $excludeId);
         if ($parentId === null) return null;

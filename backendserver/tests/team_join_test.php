@@ -33,13 +33,18 @@ $right = joinTeam('rightone', 'R', 2);
 $ll = joinTeam('lefttwo', 'L', 3);
 $lr = joinTeam('leftthree', 'L', 4);
 $lll = joinTeam('leftfour', 'L', 5);
-foreach ([[$left,$sid,'L'],[$right,$sid,'R'],[$ll,$left,'L'],[$lr,$left,'R'],[$lll,$ll,'L']] as [$id,$parent,$side]) {
+// Left link always extends the outer left leg: sponsor -> left -> ll -> lr -> lll, each on L.
+foreach ([[$left,$sid,'L'],[$right,$sid,'R'],[$ll,$left,'L'],[$lr,$ll,'L'],[$lll,$lr,'L']] as [$id,$parent,$side]) {
     $row = DB::one('SELECT placement_parent_id, placement_side, sponsor_id FROM lo_tree WHERE user_id = ?', [$id]);
-    checkTeam("placement $id stays in chosen subtree", (int) $row['placement_parent_id'] === $parent && $row['placement_side'] === $side);
+    checkTeam("placement $id follows outer leg", (int) $row['placement_parent_id'] === $parent && $row['placement_side'] === $side);
     checkTeam("sponsor $id remains original referrer", (int) $row['sponsor_id'] === $sid);
 }
 $slot = Placement::preview($sid, 'R');
-checkTeam('right preview ignores vacancies on left', $slot['parent_id'] === $right && $slot['side'] === 'L');
+checkTeam('right preview extends right leg', $slot['parent_id'] === $right && $slot['side'] === 'R');
+$slot = Placement::preview($sid, 'L');
+checkTeam('left preview is last left member', $slot['parent_id'] === $lll && $slot['side'] === 'L');
+$slot = Placement::preview($ll, 'R');
+checkTeam('downline own right link uses own tree', $slot['parent_id'] === $ll && $slot['side'] === 'R');
 $profile = DB::one('SELECT * FROM user_profiles WHERE user_id = ?', [$left]);
 checkTeam('registration fields persist', $profile['district'] === 'Dhaka' && $profile['post_code'] === '1207' && $profile['blood_group'] === 'O+' && $profile['nid_number'] === 'TEST123');
 $bad = $base + ['username' => 'invalidteam', 'team' => 'X', 'phone' => '01788000006'];
