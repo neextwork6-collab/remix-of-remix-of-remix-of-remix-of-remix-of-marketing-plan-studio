@@ -21,7 +21,7 @@ const ts = (daysAgo: number, h = 10) => {
 };
 
 function seed(): Db {
-  const members = [{ id: 1, life_id: "LOS10000", name: "Life OS Company", phone: "01700000000", email: "info@lifeos.test", status: "active", referred_by: null, created_at: ts(200), is_active: 1, lifetime_matchings: 120, placement_side: null, sponsor_life_id: null }];
+  const members: any[] = [{ id: 1, life_id: "LOS10000", name: "Life OS Company", phone: "01700000000", email: "info@lifeos.test", status: "active", referred_by: null, created_at: ts(200), is_active: 1, lifetime_matchings: 120, placement_side: null, sponsor_life_id: null }];
   NAMES.forEach((n, i) => members.push({ id: i + 2, life_id: `LOS${10001 + i}`, name: n, phone: `0171${String(1000000 + i * 7311).slice(0, 7)}`, email: null, status: i === 10 ? "suspended" : "active", referred_by: members[Math.floor(i / 2)]!.life_id, created_at: ts(180 - i * 12), is_active: i % 4 === 3 ? 0 : 1, lifetime_matchings: Math.max(0, 40 - i * 4), placement_side: i % 2 ? "R" : "L", sponsor_life_id: members[Math.floor(i / 2)]!.life_id }));
   const activations = members.slice(1).map((m, i) => ({ id: i + 1, activation_code: `ACT-${7000 + i}`, payment_ref: i % 4 === 3 ? `PENDING-${m.id}` : `TRX${88000 + i}`, payment_status: i % 4 === 3 ? "PENDING" : "SUCCESS", fee: 1000, bv: 1000, processed: i % 4 === 3 ? 0 : 1, created_at: m.created_at, processed_at: i % 4 === 3 ? null : m.created_at, user_id: m.id }));
   const ledger: any[] = [];
