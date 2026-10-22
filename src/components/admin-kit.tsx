@@ -97,7 +97,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div ref={viewportRef} className="lifeos-member-viewport">
       <div className="lifeos-member lifeos-member-bg" style={{ zoom: scale }}>
         <div className="content_full">
-          <div className="header_content lifeos-banner">
+          <div className="header_content lifeos-banner" style={{ backgroundImage: "url(/member-kit/images/admin-banner.jpg)" }}>
             <Link to="/" aria-label="Life OS home" style={{ display: "block", height: 200 }} />
           </div>
         </div>
