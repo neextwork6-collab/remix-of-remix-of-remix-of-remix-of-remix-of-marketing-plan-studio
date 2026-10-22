@@ -39,7 +39,12 @@ import { Route as SeniorManagementRouteImport } from './routes/senior-management
 import { Route as TripleStemcellH2oRouteImport } from './routes/triple-stemcell-h2o'
 import { Route as VideoGalleryRouteImport } from './routes/video-gallery'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminMemberListRouteImport } from './routes/admin.member-list'
+import { Route as AdminMemberReportRouteImport } from './routes/admin.member-report'
+import { Route as AdminNoticeRouteImport } from './routes/admin.notice'
+import { Route as AdminPasswordRouteImport } from './routes/admin.password'
 import { Route as AdminPlanRouteImport } from './routes/admin.plan'
+import { Route as AdminScrollNewsRouteImport } from './routes/admin.scroll-news'
 import { Route as AdminSiteConfigRouteImport } from './routes/admin.site-config'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as MemberIndexRouteImport } from './routes/member.index'
@@ -205,9 +210,34 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMemberListRoute = AdminMemberListRouteImport.update({
+  id: '/member-list',
+  path: '/member-list',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMemberReportRoute = AdminMemberReportRouteImport.update({
+  id: '/member-report',
+  path: '/member-report',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNoticeRoute = AdminNoticeRouteImport.update({
+  id: '/notice',
+  path: '/notice',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPasswordRoute = AdminPasswordRouteImport.update({
+  id: '/password',
+  path: '/password',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPlanRoute = AdminPlanRouteImport.update({
   id: '/plan',
   path: '/plan',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminScrollNewsRoute = AdminScrollNewsRouteImport.update({
+  id: '/scroll-news',
+  path: '/scroll-news',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSiteConfigRoute = AdminSiteConfigRouteImport.update({
@@ -311,7 +341,12 @@ export interface FileRoutesByFullPath {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/member-list': typeof AdminMemberListRoute
+  '/admin/member-report': typeof AdminMemberReportRoute
+  '/admin/notice': typeof AdminNoticeRoute
+  '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
   '/admin/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
@@ -356,7 +391,12 @@ export interface FileRoutesByTo {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/member-list': typeof AdminMemberListRoute
+  '/admin/member-report': typeof AdminMemberReportRoute
+  '/admin/notice': typeof AdminNoticeRoute
+  '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
   '/admin/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
@@ -404,7 +444,12 @@ export interface FileRoutesById {
   '/senior-management': typeof SeniorManagementRoute
   '/triple-stemcell-h2o': typeof TripleStemcellH2oRoute
   '/video-gallery': typeof VideoGalleryRoute
+  '/admin/member-list': typeof AdminMemberListRoute
+  '/admin/member-report': typeof AdminMemberReportRoute
+  '/admin/notice': typeof AdminNoticeRoute
+  '/admin/password': typeof AdminPasswordRoute
   '/admin/plan': typeof AdminPlanRoute
+  '/admin/scroll-news': typeof AdminScrollNewsRoute
   '/admin/site-config': typeof AdminSiteConfigRoute
   '/admin_/login': typeof AdminLoginRoute
   '/member/activation': typeof MemberActivationRoute
@@ -453,7 +498,12 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/member-list'
+    | '/admin/member-report'
+    | '/admin/notice'
+    | '/admin/password'
     | '/admin/plan'
+    | '/admin/scroll-news'
     | '/admin/site-config'
     | '/admin/login'
     | '/member/activation'
@@ -498,7 +548,12 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/member-list'
+    | '/admin/member-report'
+    | '/admin/notice'
+    | '/admin/password'
     | '/admin/plan'
+    | '/admin/scroll-news'
     | '/admin/site-config'
     | '/admin/login'
     | '/member/activation'
@@ -545,7 +600,12 @@ export interface FileRouteTypes {
     | '/senior-management'
     | '/triple-stemcell-h2o'
     | '/video-gallery'
+    | '/admin/member-list'
+    | '/admin/member-report'
+    | '/admin/notice'
+    | '/admin/password'
     | '/admin/plan'
+    | '/admin/scroll-news'
     | '/admin/site-config'
     | '/admin_/login'
     | '/member/activation'
@@ -809,11 +869,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/member-list': {
+      id: '/admin/member-list'
+      path: '/member-list'
+      fullPath: '/admin/member-list'
+      preLoaderRoute: typeof AdminMemberListRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/member-report': {
+      id: '/admin/member-report'
+      path: '/member-report'
+      fullPath: '/admin/member-report'
+      preLoaderRoute: typeof AdminMemberReportRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notice': {
+      id: '/admin/notice'
+      path: '/notice'
+      fullPath: '/admin/notice'
+      preLoaderRoute: typeof AdminNoticeRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/password': {
+      id: '/admin/password'
+      path: '/password'
+      fullPath: '/admin/password'
+      preLoaderRoute: typeof AdminPasswordRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/plan': {
       id: '/admin/plan'
       path: '/plan'
       fullPath: '/admin/plan'
       preLoaderRoute: typeof AdminPlanRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/scroll-news': {
+      id: '/admin/scroll-news'
+      path: '/scroll-news'
+      fullPath: '/admin/scroll-news'
+      preLoaderRoute: typeof AdminScrollNewsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/site-config': {
@@ -918,13 +1013,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminMemberListRoute: typeof AdminMemberListRoute
+  AdminMemberReportRoute: typeof AdminMemberReportRoute
+  AdminNoticeRoute: typeof AdminNoticeRoute
+  AdminPasswordRoute: typeof AdminPasswordRoute
   AdminPlanRoute: typeof AdminPlanRoute
+  AdminScrollNewsRoute: typeof AdminScrollNewsRoute
   AdminSiteConfigRoute: typeof AdminSiteConfigRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminMemberListRoute: AdminMemberListRoute,
+  AdminMemberReportRoute: AdminMemberReportRoute,
+  AdminNoticeRoute: AdminNoticeRoute,
+  AdminPasswordRoute: AdminPasswordRoute,
   AdminPlanRoute: AdminPlanRoute,
+  AdminScrollNewsRoute: AdminScrollNewsRoute,
   AdminSiteConfigRoute: AdminSiteConfigRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
