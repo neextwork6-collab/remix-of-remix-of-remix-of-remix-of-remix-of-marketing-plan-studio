@@ -50,7 +50,7 @@
 - [ ] Verify image viewers, audio playback, video controls, menus, FAQs and enquiry forms.
 - [ ] Run regression tests and record remaining external limitations.
 ## Referral join + ROOT
-- [ ] Reverify same-side chain placement for Left/Right links, displayed placement IDs, and downline-owned links; do not deploy unrelated financial changes.
+- [x] Reverify same-side chain placement for Left/Right links, displayed placement IDs, and downline-owned links: fresh isolated PHP suite 75/75, team suite 42/42, link unit tests 2/2; browser registered Left/Right members and confirmed saved placement plus authenticated dashboards. External server not updated; no financial deployment performed.
 - [x] Add Left/Right copy links, selected-subtree automatic placement, and reference joining fields; verify against local PHP accounts. (75/75 backend tests, 23/23 team tests; browser: registration via Left and Right links, clipboard copy of both links, auto-placement into first free slot of the chosen subtree, desktop + mobile verified)
 - [x] Join page via referral link (auto sponsor + auto placement)
 - [x] ROOT button on login page, referral link copy on dashboard
