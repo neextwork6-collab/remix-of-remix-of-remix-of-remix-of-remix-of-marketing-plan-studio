@@ -91,18 +91,32 @@ $router->post('/api/admin/withdrawals/{id}/process', function ($p) {
     Http::ok();
 });
 
+const ADMIN_SETTING_KEYS = ['matching_paused', 'daily_matching_cap', 'withdraw_min', 'withdraw_max', 'withdraw_charge_pct',
+    'site_name', 'site_slogan', 'site_url', 'site_email', 'login_status', 'signup_status', 'withdrawal_status', 'profile_edit_status'];
+
+$router->get('/api/admin/settings', function () {
+    Auth::admin();
+    $out = [];
+    foreach (DB::all('SELECT k, v FROM lo_settings') as $r) if (in_array($r['k'], ADMIN_SETTING_KEYS, true)) $out[$r['k']] = $r['v'];
+    Http::ok($out);
+});
+
 $router->post('/api/admin/settings', function ($p) {
     Auth::admin();
     $b = Http::body();
-    foreach (['matching_paused', 'daily_matching_cap', 'withdraw_min', 'withdraw_charge_pct'] as $k) {
+    foreach (ADMIN_SETTING_KEYS as $k) {
         if (!isset($b[$k])) continue;
+        $raw = (string) $b[$k];
         // Plan rule: daily matching cap can be lowered but never raised above ৳5,000.
         if ($k === 'daily_matching_cap') {
             $v = (float) $b[$k];
             if (!is_finite($v) || $v < 0 || $v > \LifeOS\Engine\Plan::DAILY_MATCHING_CAP) throw new HttpError('daily_matching_cap must be between 0 and 5000', 422);
         }
-        if ($k === 'matching_paused' && !in_array((string) $b[$k], ['0', '1'], true)) throw new HttpError('matching_paused must be 0 or 1', 422);
-        DB::run('INSERT INTO lo_settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = VALUES(v)', [$k, (string) $b[$k]]);
+        if (in_array($k, ['matching_paused', 'login_status', 'signup_status', 'withdrawal_status', 'profile_edit_status'], true) && !in_array($raw, ['0', '1'], true)) throw new HttpError("$k must be 0 or 1", 422);
+        if (in_array($k, ['withdraw_min', 'withdraw_max'], true) && (!is_numeric($raw) || (float) $raw < 0)) throw new HttpError("$k must be a positive number", 422);
+        if ($k === 'withdraw_charge_pct' && (!is_numeric($raw) || (float) $raw < 0 || (float) $raw > 100)) throw new HttpError('withdraw_charge_pct must be between 0 and 100', 422);
+        if (strlen($raw) > 255) throw new HttpError("$k is too long", 422);
+        DB::run('INSERT INTO lo_settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = VALUES(v)', [$k, $raw]);
     }
     Http::ok();
 });
