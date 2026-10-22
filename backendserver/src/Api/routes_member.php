@@ -33,7 +33,35 @@ $router->post('/api/member/register', function () {
         $sponsorId = (int) $sp['id'];
     }
 
-    $result = DB::tx(function () use ($b, $sponsorId) {
+    $team = $b['team'] ?? null;
+    if ($team !== null && !in_array($team, ['L', 'R'], true)) throw new HttpError('Invalid team');
+    if ($team !== null && !$sponsorId) throw new HttpError('Sponsor required for team placement');
+    $extended = isset($b['username']) || $team !== null;
+    $username = trim((string) ($b['username'] ?? ''));
+    if ($extended) {
+        foreach (['email', 'blood_group', 'district', 'post_code', 'address_current', 'username'] as $field) {
+            if (trim((string) ($b[$field] ?? '')) === '') throw new HttpError("$field required");
+        }
+        if (empty($b['accepted_terms'])) throw new HttpError('Terms agreement required');
+        if (($b['confirm_password'] ?? '') !== $b['pin']) throw new HttpError('Passwords do not match');
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]{3,39}$/', $username)) throw new HttpError('Username must be 4–40 characters, starting with a letter');
+        if (DB::one('SELECT id FROM users WHERE username = ? OR life_id = ? OR referral_code = ? OR phone = ?', [$username, $username, $username, $username])) throw new HttpError('Username already registered', 409);
+        if (!in_array($b['blood_group'], ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], true)) throw new HttpError('Invalid blood group');
+    }
+    foreach (['nid_number' => 30, 'district' => 60, 'post_code' => 12, 'address_current' => 2000] as $field => $limit) {
+        if (mb_strlen((string) ($b[$field] ?? '')) > $limit) throw new HttpError("$field is too long");
+    }
+    $photo = $b['photo_base64'] ?? null;
+    if ($photo !== null && $photo !== '') {
+        if (!is_string($photo) || strlen($photo) > 2800000 || !preg_match('#^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$#', $photo, $m)) throw new HttpError('Photo must be JPG, PNG or WebP, at most 2 MB');
+        $binary = base64_decode($m[2], true);
+        $info = $binary === false ? false : @getimagesizefromstring($binary);
+        if (!$info || strlen($binary) > 2097152 || !in_array($info['mime'], ['image/jpeg', 'image/png', 'image/webp'], true)) throw new HttpError('Invalid photo');
+    }
+    $result = DB::tx(function () use ($b, $sponsorId, $team, $username, $photo) {
+        DB::one('SELECT id FROM lo_placement_lock WHERE id = 1 FOR UPDATE');
+        if (!$sponsorId && DB::one('SELECT user_id FROM lo_tree LIMIT 1')) throw new HttpError('A sponsor referral link is required to register');
+        if ($sponsorId && !DB::one('SELECT id FROM users WHERE id = ? AND status <> "suspended"', [$sponsorId])) throw new HttpError('Sponsor unavailable');
         $lifeId = 'LO' . str_pad((string) random_int(1, 99999999), 8, '0', STR_PAD_LEFT);
         $refCode = strtoupper(bin2hex(random_bytes(4)));
         $id = DB::insert(
@@ -42,10 +70,12 @@ $router->post('/api/member/register', function () {
             [$lifeId, $lifeId, $refCode, $b['referral_code'] ?? null, $b['phone'], $b['email'] ?? null,
              password_hash((string) $b['pin'], PASSWORD_DEFAULT), !empty($b['accepted_terms']) ? 1 : 0]
         );
+        if ($username !== '') DB::run('UPDATE users SET username = ? WHERE id = ?', [$username, $id]);
         DB::insert('INSERT INTO user_wallets (user_id) VALUES (?)', [$id]);
         DB::insert('INSERT INTO user_profiles (user_id, name) VALUES (?, ?)', [$id, trim((string) $b['name'])]);
+        DB::run('UPDATE user_profiles SET blood_group = ?, nid_number = ?, district = ?, post_code = ?, address_current = ?, photo_base64 = ? WHERE user_id = ?', [$b['blood_group'] ?? null, $b['nid_number'] ?? null, $b['district'] ?? null, $b['post_code'] ?? null, $b['address_current'] ?? null, $photo, $id]);
         Placement::ensureNode($id, $sponsorId);
-        Placement::place($id, $sponsorId);
+        Placement::place($id, $sponsorId, $team);
         return $id;
     });
 
@@ -60,12 +90,15 @@ $router->get('/api/member/sponsor', function () {
     $sp = DB::one('SELECT u.id, u.life_id FROM users u WHERE u.referral_code = ? AND u.status <> "suspended"', [$code]);
     if (!$sp) throw new HttpError('Invalid referral code', 404);
     $name = DB::val('SELECT name FROM user_profiles WHERE user_id = ? ORDER BY id LIMIT 1', [(int) $sp['id']]);
-    Http::ok(['name' => $name ?: $sp['life_id'], 'life_id' => $sp['life_id']]);
+    $team = $_GET['team'] ?? null;
+    $slot = Placement::preview((int) $sp['id'], $team);
+    $placement = $slot ? DB::val('SELECT life_id FROM users WHERE id = ?', [$slot['parent_id']]) : null;
+    Http::ok(['name' => $name ?: $sp['life_id'], 'life_id' => $sp['life_id'], 'team' => $team, 'placement_life_id' => $placement, 'placement_side' => $slot['side'] ?? null]);
 });
 
 $router->post('/api/member/login', function () {
     $b = Http::body();
-    $u = DB::one('SELECT * FROM users WHERE phone = ? OR life_id = ? OR referral_code = ?', [$b['username'] ?? '', $b['username'] ?? '', $b['username'] ?? '']);
+    $u = DB::one('SELECT * FROM users WHERE phone = ? OR life_id = ? OR referral_code = ? OR username = ?', [$b['username'] ?? '', $b['username'] ?? '', $b['username'] ?? '', $b['username'] ?? '']);
     if (!$u || !password_verify((string) ($b['password'] ?? ''), (string) $u['pin_hash'])) {
         throw new HttpError('Invalid credentials', 401);
     }
