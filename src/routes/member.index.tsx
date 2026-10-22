@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Copy, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { referralJoinUrl, type JoinTeam } from "@/lib/join-fields";
 import { Page, useMember } from "@/components/member-kit";
 import { bdt, LEDGER_LABELS } from "@/lib/member-api";
 
@@ -30,7 +33,8 @@ function Dashboard() {
     ["Cell Number", me.phone],
     ["Joining Date Time", me.created_at],
     ["Referral Code", me.referral_code],
-    ["Joining Link", <JoinLink key="j" code={me.referral_code} />],
+    ["Left Team Link", <JoinLink key="left" code={me.referral_code} team="L" />],
+    ["Right Team Link", <JoinLink key="right" code={me.referral_code} team="R" />],
     ["Referral UserID", me.referred_by ?? "N/A"],
     ["Total Referral", me.total_referral],
     ["Lifetime Matchings", rank?.lifetime_matchings ?? 0],
@@ -99,13 +103,22 @@ function Dashboard() {
   );
 }
 
-function JoinLink({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false);
-  const url = typeof window === "undefined" ? "" : `${window.location.origin}/join?ref=${encodeURIComponent(code)}`;
+function JoinLink({ code, team }: { code: string; team: JoinTeam }) {
+  const [status, setStatus] = useState("");
+  const [url, setUrl] = useState("");
+  useEffect(() => { setUrl(referralJoinUrl(window.location.origin, code, team)); }, [code, team]);
+  async function copy() {
+    try { await navigator.clipboard.writeText(url); setStatus("Copied"); }
+    catch { setStatus("Copy unavailable — select the link above."); }
+  }
   return (
-    <span>
-      <a href={url} target="_blank" rel="noreferrer">Open form</a>{" "}
-      <button type="button" onClick={() => { navigator.clipboard.writeText(url); setCopied(true); }}>{copied ? "Copied" : "Copy link"}</button>
+    <span className="member-referral-link">
+      <input aria-label={`${team === "L" ? "Left" : "Right"} Team referral link`} readOnly value={url} onFocus={e => e.currentTarget.select()} />
+      <span className="member-referral-actions">
+        <Button variant="reference" type="button" onClick={copy} disabled={!url} title={`Copy ${team === "L" ? "Left" : "Right"} Team link`}><Copy size={13} /> Copy</Button>
+        <Button variant="reference" asChild><a href={url || undefined} target="_blank" rel="noreferrer" title="Open joining form"><ExternalLink size={13} /> Open</a></Button>
+      </span>
+      <span role="status">{status}</span>
     </span>
   );
 }

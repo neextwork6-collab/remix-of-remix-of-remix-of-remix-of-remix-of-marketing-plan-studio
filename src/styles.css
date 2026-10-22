@@ -990,3 +990,36 @@ right: 0; bottom: 0; top: 0;
 }
 
 .timeline-year{text-align: center; padding: 20px; background-color: var(--reference-timeline-12); margin-bottom: 20px; position: relative; font-weight: 700; }
+/* Reference joining form and separate team-link controls. */
+.team-join-page { background: var(--background, var(--reference-tone-3)); color: var(--foreground, var(--reference-tone-2)); min-height: 100vh; padding: 28px 16px 40px; font-family: Arial, sans-serif; }
+.team-join-content { max-width: 670px; margin: 0 auto; }
+.team-join-content h1 { font-size: 22px; margin: 0 0 18px; font-weight: 600; }
+.join-sponsor { margin: 0 0 18px; font-size: 15px; }
+.team-join-form { display: grid; gap: 8px; }
+.join-field { display: grid; grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr); align-items: center; gap: 8px; font-size: 18px; }
+.join-control { min-width: 0; }
+.join-control > input:not([type=file]), .join-control > select, .join-control > textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--reference-tone-1); border-radius: 0; background: var(--background, var(--reference-tone-3)); color: inherit; font: inherit; padding: 3px 8px; min-height: 30px; }
+.join-control > input[readonly] { background: var(--reference-tone-12); }
+.join-control > input[type=file] { width: 100%; font-size: 15px; }
+.join-control input[type=file]::file-selector-button, .join-submit { border: 1px solid var(--reference-tone-1); background: var(--reference-tone-12); color: inherit; border-radius: 0; padding: 3px 9px; font: inherit; cursor: pointer; }
+.join-control > textarea { min-height: 98px; resize: vertical; }
+.join-required, .join-error { color: var(--destructive, var(--reference-tone-38)); }
+.join-error { font-size: 15px; margin: 8px 0; }
+.join-team { border: 0; padding: 0; margin: 0; display: flex; gap: 20px; flex-wrap: wrap; }
+.join-team label, .join-terms { display: flex; align-items: center; gap: 8px; font-size: 17px; }
+.join-team input, .join-terms input { width: 18px; height: 18px; accent-color: var(--primary); }
+.join-team input:disabled { opacity: 1; }
+.join-submit:disabled { opacity: .5; cursor: not-allowed; }
+.join-photo { width: 75px; height: 95px; object-fit: cover; margin-top: 8px; }
+.member-referral-link { display: grid; gap: 4px; min-width: 0; }
+.member-referral-link > input { width: 100%; min-width: 0; font-size: 11px; }
+.member-referral-actions { display: flex; gap: 8px; }
+.member-referral-actions button, .member-referral-actions a { display: inline-flex; gap: 4px; align-items: center; }
+.member-referral-link [role=status] { font-size: 11px; }
+@media (max-width: 540px) {
+  .join-field { grid-template-columns: minmax(0, .85fr) 8px minmax(0, 1fr); gap: 5px; font-size: 14px; }
+  .join-team { gap: 8px; }
+  .join-team label, .join-terms { font-size: 13px; }
+  .join-control > input[type=file] { font-size: 11px; }
+  .team-join-content h1 { font-size: 20px; }
+}
