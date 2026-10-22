@@ -5,6 +5,7 @@ import { adminApi, adminToken } from "@/lib/admin-api";
 import { fmtDate } from "@/components/member-kit";
 
 export { fmtDate };
+export { Page, DataTable, Msg } from "@/components/member-kit";
 
 /** Menu mirrors the reference admin kit structure (green member-panel style). */
 const MENU: { label: string; items: { to: string; label: string }[] }[] = [
